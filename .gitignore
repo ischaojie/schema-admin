@@ -1,0 +1,8 @@
+.venv
+.vscode
+.mypy_cache
+.idea
+__pycache__
+
+*/node_modules/
+.eslintrc.cjs
