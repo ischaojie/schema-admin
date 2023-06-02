@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from conger.model import BaseModel
+from congers.model import BaseModel
 
 from flask import (
     Blueprint,
@@ -13,8 +13,8 @@ from flask import (
 )
 from flask_cors import CORS
 
-from conger.database import Database
-from conger.schema import Metadata, Model, ModelMetadata
+from congers.database import Database
+from congers.schema import Metadata, Model, ModelMetadata
 
 
 def load_package_files(path: str):
@@ -29,13 +29,13 @@ class BaseConger:
         self.app = app
         self.database = database
         self.title = title
-        self.key_prefix = "conger"
+        self.key_prefix = "congers"
 
         self.admin = Blueprint(
-            "conger",
+            "congers",
             __name__,
-            static_folder=load_package_files("conger/static"),
-            template_folder=load_package_files("conger/templates"),
+            static_folder=load_package_files("congers/static"),
+            template_folder=load_package_files("congers/templates"),
         )
         self.api = Blueprint("api", __name__)
         self._model: dict[str, type[BaseModel]] = {}
@@ -97,18 +97,18 @@ class BaseConger:
 class Conger(BaseConger):
     """
     from flask import Flask
-    from conger import Conger, BaseModel
+    from congers import Conger, BaseModel
     from pydantic import BaseModel
 
     app = Flask(__name__)
-    conger = Conger(app)
+    congers = Conger(app)
 
     class User(BaseModel):
         name: str
         desc: str = "this is description"
         age: int
 
-    conger.add_model(User)
+    congers.add_model(User)
     """
 
     def __init__(
@@ -116,7 +116,7 @@ class Conger(BaseConger):
         app: Flask,
         database,
         title: str = "Conger",
-        url_prefix: str = "/conger",
+        url_prefix: str = "/congers",
         theme: str = "default",
     ) -> None:
         self.url_prefix = url_prefix
@@ -148,7 +148,7 @@ class Conger(BaseConger):
         )
 
     def index(self, path=""):
-        manifest_file = load_package_files("conger/static/manifest.json")
+        manifest_file = load_package_files("congers/static/manifest.json")
         with open(manifest_file, "r") as f:
             manifest = f.read()
 

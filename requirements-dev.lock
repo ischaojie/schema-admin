@@ -17,5 +17,5 @@ markupsafe==2.1.2
 pickledb==0.9.2
 pydantic==1.10.8
 six==1.16.0
-typing-extensions==4.6.1
+typing-extensions==4.6.3
 werkzeug==2.3.4

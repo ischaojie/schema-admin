@@ -1,7 +1,7 @@
 [project]
-name = "conger"
+name = "congers"
 version = "0.1.0"
-description = ""
+description = "A Lightweight data model management for Python"
 authors = [{ name = "chaojie", email = "hi@chaojie.fun" }]
 dependencies = ["pydantic~=1.10.8", "flask~=2.3.2", "flask-cors~=3.0.10"]
 readme = "README.md"

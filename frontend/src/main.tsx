@@ -15,7 +15,7 @@ library.add(fas);
 
 const router = createBrowserRouter([
   {
-    path: "/conger",
+    path: "/congers",
     element: <Root />,
     errorElement: <ErrorPage />,
     loader: rootLoader,

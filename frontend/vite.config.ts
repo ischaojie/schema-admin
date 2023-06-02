@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react(), UnoCSS()],
   server: {
     proxy: {
-      "/conger/api": {
+      "/congers/api": {
         target: "http://127.0.0.1:5000/",
         changeOrigin: true,
       },
@@ -15,7 +15,7 @@ export default defineConfig({
   },
   build: {
     manifest: true,
-    outDir: "../src/conger/static",
+    outDir: "../src/congers/static",
     emptyOutDir: true,
     rollupOptions: {
       input: "src/main.tsx",

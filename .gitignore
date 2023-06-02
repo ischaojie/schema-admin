@@ -3,6 +3,8 @@
 .mypy_cache
 .idea
 __pycache__
+dist
+.python-version
 
 */node_modules/
 .eslintrc.cjs
