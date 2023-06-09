@@ -169,7 +169,7 @@ function Copyright(props: any) {
       align="center"
       {...props}
     >
-      {"Copyright © Conger"} {new Date().getFullYear()}
+      {"Copyright © Schema Admin"} {new Date().getFullYear()}
       {"."}
     </Typography>
   );

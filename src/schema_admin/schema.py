@@ -14,7 +14,7 @@ class SchemaMetadata(BaseModel):
 
 
 class Metadata(BaseModel):
-    title: str = "Conger"
+    title: str = "Admin"
     icon: str = ""
     total: int
     schemas: list[SchemaMetadata] = []
