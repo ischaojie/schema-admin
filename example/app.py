@@ -2,14 +2,14 @@ from datetime import datetime
 from enum import Enum
 
 import pickledb
-from congers import BaseModel, Conger, Field
+from schema_admin import BaseSchema, Admin, Field
 from flask import Flask, redirect
 
 app = Flask(__name__)
 
 db = pickledb.load("./db.json", True)
 
-congers = Conger(app, database=db)
+schema_admin = Admin(app, database=db)
 
 
 class FruitEnum(str, Enum):
@@ -17,7 +17,7 @@ class FruitEnum(str, Enum):
     banana = "banana"
 
 
-class User(BaseModel):
+class User(BaseSchema):
     name: str
     desc: str = "this is description"
     age: int = Field(..., gt=18, lt=100)
@@ -30,7 +30,7 @@ class User(BaseModel):
         key_prefix = "user"
 
 
-class Book(BaseModel):
+class Book(BaseSchema):
     title: str
     price: int
 
@@ -38,13 +38,13 @@ class Book(BaseModel):
         icon = "fa-book"
 
 
-congers.add_model(User)
-congers.add_model(Book)
+schema_admin.add_schema(User)
+schema_admin.add_schema(Book)
 
 
 @app.get("/")
 def index():
-    return redirect("/congers")
+    return redirect("/admin")
 
 
 if __name__ == "__main__":

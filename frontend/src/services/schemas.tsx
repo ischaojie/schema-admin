@@ -1,8 +1,8 @@
 
 
 // /api/models/<name>
-export async function getModel(name: string) {
-  return await fetch(`/congers/api/models/${name}`, {
+export async function getSchema(name: string) {
+  return await fetch(`/admin/api/schemas/${name}`, {
     method: "GET",
   })
     .then((rsp) => rsp.json())
@@ -11,13 +11,13 @@ export async function getModel(name: string) {
 
 // /api
 export async function getMetadata() {
-  return await fetch("/congers/api", { method: "GET" })
+  return await fetch("/admin/api", { method: "GET" })
     .then((rsp) => rsp.json())
     .catch((err) => console.error(err));
 }
 
-export async function saveModelData(name: string, data: any) {
-  return await fetch(`/congers/api/models/${name}/data`, {
+export async function saveSchemaData(name: string, data: any) {
+  return await fetch(`/admin/api/schemas/${name}/data`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

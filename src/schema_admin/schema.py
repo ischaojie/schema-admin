@@ -3,12 +3,12 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 
-class Model(BaseModel):
-    schema_: dict = Field(alias="schema")
+class Schema(BaseModel):
+    struct: dict
     data: dict
 
 
-class ModelMetadata(BaseModel):
+class SchemaMetadata(BaseModel):
     name: str | None = None
     icon: str | None = None
 
@@ -17,4 +17,4 @@ class Metadata(BaseModel):
     title: str = "Conger"
     icon: str = ""
     total: int
-    models: list[ModelMetadata] = []
+    schemas: list[SchemaMetadata] = []

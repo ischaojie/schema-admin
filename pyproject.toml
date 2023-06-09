@@ -1,9 +1,13 @@
 [project]
-name = "congers"
+name = "schema-admin"
 version = "0.1.0"
-description = "A Lightweight data model management for Python"
+description = "A Lightweight schema model management for Python"
 authors = [{ name = "chaojie", email = "hi@chaojie.fun" }]
-dependencies = ["pydantic~=1.10.8", "flask~=2.3.2", "flask-cors~=3.0.10"]
+dependencies = [
+    "pydantic~=1.10.8",
+    "flask~=2.3.2",
+    "flask-cors~=3.0.10",
+]
 readme = "README.md"
 requires-python = ">= 3.8"
 
@@ -15,7 +19,11 @@ build-backend = "hatchling.build"
 managed = true
 dev-dependencies = [
     "pickledb~=0.9.2",
+    "pytest~=7.3.1",
 ]
+
+[tool.rye.scripts]
+test = "pytest tests -s"
 
 [tool.hatch.metadata]
 allow-direct-references = true

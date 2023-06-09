@@ -1,5 +1,5 @@
 import { useLoaderData } from "react-router-dom";
-import { getMetadata } from "../services/models";
+import { getMetadata } from "../services/schemas";
 
 export async function loader() {
   const metadata = await getMetadata();

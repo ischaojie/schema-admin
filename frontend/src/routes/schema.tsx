@@ -3,28 +3,28 @@ import { RJSFSchema } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
 import { Form as SchemaForm } from "@rjsf/mui";
 import { Form, useLoaderData } from "react-router-dom";
-import { getModel, saveModelData } from "../services/models";
+import { getSchema, saveSchemaData } from "../services/schemas";
 import { Snackbar, Alert } from "@mui/material";
 
 export async function loader({ params }) {
-  const modelName = params.modelId;
-  const model = await getModel(modelName);
-  return { modelName, model };
+  const schemaName = params.schemaId;
+  const schema = await getSchema(schemaName);
+  return { schemaName, schema };
 }
 
-export default function Model(props) {
-  const { modelName, model } = useLoaderData();
+export default function Schema(props) {
+  const { SchemaName, schema } = useLoaderData();
   const [open, SetOpen] = useState(false);
-  const [modelData, setModelData] = useState({});
+  const [schemaData, setSchemaData] = useState({});
 
   useEffect(() => {
-    setModelData(model.data);
-  }, [model.data]);
+    setSchemaData(schema.data);
+  }, [schema.data]);
 
   const Submit = (e) => {
-    saveModelData(modelName, e.formData);
+    saveSchemaData(SchemaName, e.formData);
     SetOpen(true);
-    setModelData(e.formData);
+    setSchemaData(e.formData);
   };
 
   const handleSnackBarClose = () => {
@@ -34,8 +34,8 @@ export default function Model(props) {
   return (
     <div>
       <SchemaForm
-        schema={model.schema}
-        formData={modelData}
+        schema={schema.struct}
+        formData={schemaData}
         validator={validator}
         onSubmit={Submit}
       />
@@ -45,14 +45,14 @@ export default function Model(props) {
         open={open}
         autoHideDuration={6000}
         onClose={handleSnackBarClose}
-        key={model.schema.title}
+        key={schema.struct.title}
       >
         <Alert
           onClose={handleSnackBarClose}
           severity="success"
           sx={{ width: "100%" }}
         >
-          {`Update ${model.schema.title} successfully!`}
+          {`Update ${schema.struct.title} successfully!`}
         </Alert>
       </Snackbar>
     </div>

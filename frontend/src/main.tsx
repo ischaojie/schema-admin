@@ -4,7 +4,7 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root, { loader as rootLoader } from "./routes/root.tsx";
 import Index from "./routes/index";
-import Model, { loader as modelLoader } from "./routes/model.tsx";
+import Schema, { loader as schemaLoader } from "./routes/schema.tsx";
 import { loader as indexLoader } from "./routes/index.tsx";
 import ErrorPage from "./404.tsx";
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -15,7 +15,7 @@ library.add(fas);
 
 const router = createBrowserRouter([
   {
-    path: "/congers",
+    path: "/admin",
     element: <Root />,
     errorElement: <ErrorPage />,
     loader: rootLoader,
@@ -26,9 +26,9 @@ const router = createBrowserRouter([
         loader: indexLoader,
       },
       {
-        path: "models/:modelId",
-        element: <Model />,
-        loader: modelLoader,
+        path: "schemas/:schemaId",
+        element: <Schema />,
+        loader: schemaLoader,
       },
     ],
   },

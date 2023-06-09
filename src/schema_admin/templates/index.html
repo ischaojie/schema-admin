@@ -9,10 +9,10 @@
     {% for type, value in manifest['src/main.tsx']|items %}
     {% if type=='css' %}
     {% for css in value %}
-    <link rel="stylesheet" href="{{url_for('congers.static', filename=css) }}" />
+    <link rel="stylesheet" href="{{url_for('admin.static', filename=css) }}" />
     {% endfor %}
     {% elif type == 'file' %}
-    <script type="module" src="{{ url_for('congers.static', filename=value) }}"></script>
+    <script type="module" src="{{ url_for('admin.static', filename=value) }}"></script>
     {% endif %}
     {% endfor %}
 

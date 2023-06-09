@@ -15,7 +15,7 @@ import Paper from "@mui/material/Paper";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import MuiDrawer from "@mui/material/Drawer";
-import { getMetadata } from "../services/models";
+import { getMetadata } from "../services/schemas";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
@@ -105,12 +105,12 @@ export default function Root() {
                   <ListItemText primary="Home" />
                 </ListItemButton>
               </Link>
-              {metadata.models.length ? (
+              {metadata.schemas.length ? (
                 <>
-                  {metadata.models.map((model, index) => (
+                  {metadata.schemas.map((schema, index) => (
                     <Link
-                      to={`models/${model.name}`}
-                      key={model.name}
+                      to={`schemas/${schema.name}`}
+                      key={schema.name}
                       className="no-underline text-black"
                     >
                       <ListItemButton
@@ -118,13 +118,13 @@ export default function Root() {
                         onClick={(e) => handleListItemClick(e, index + 1)}
                       >
                         <ListItemIcon>
-                          {model.icon ? (
-                            <FontAwesomeIcon icon={model.icon} />
+                          {schema.icon ? (
+                            <FontAwesomeIcon icon={schema.icon} />
                           ) : (
                             <></>
                           )}
                         </ListItemIcon>
-                        <ListItemText primary={model.name} />
+                        <ListItemText primary={schema.name} />
                       </ListItemButton>
                     </Link>
                   ))}

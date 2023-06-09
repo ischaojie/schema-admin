@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from congers.model import BaseModel
+from schema_admin.model import BaseSchema
 
 from flask import (
     Blueprint,
@@ -13,8 +13,8 @@ from flask import (
 )
 from flask_cors import CORS
 
-from congers.database import Database
-from congers.schema import Metadata, Model, ModelMetadata
+from schema_admin.database import Database
+from schema_admin.schema import Metadata, Schema, SchemaMetadata
 
 
 def load_package_files(path: str):
@@ -24,62 +24,64 @@ def load_package_files(path: str):
     return importlib.resources.files(pkg).joinpath(path)
 
 
-class BaseConger:
-    def __init__(self, app: Flask, database: Database, title: str = "Conger") -> None:
+class BaseAdmin:
+    def __init__(self, app: Flask, database: Database, title: str = "Admin") -> None:
         self.app = app
         self.database = database
         self.title = title
-        self.key_prefix = "congers"
+        self.key_prefix = "schemas"
 
         self.admin = Blueprint(
-            "congers",
+            "admin",
             __name__,
-            static_folder=load_package_files("congers/static"),
-            template_folder=load_package_files("congers/templates"),
+            static_folder=load_package_files("schema_admin/static"),
+            template_folder=load_package_files("schema_admin/templates"),
         )
         self.api = Blueprint("api", __name__)
-        self._model: dict[str, type[BaseModel]] = {}
+        self._schemas: dict[str, type[BaseSchema]] = {}
 
-    def add_model(self, model: type[BaseModel]) -> None:
-        self._model[model.__name__.lower()] = model
+    def add_schema(self, schema: type[BaseSchema]) -> None:
+        name = schema.__config__.title if schema.__config__.title else schema.__name__
+        name = name.lower()
+        self._schemas[name] = schema
 
     def metadata(self):
         model_metadata = []
-        for name, model in self._model.items():
-            _metadata = ModelMetadata(name=name, icon=model.__config__.icon)
+        for name, schema in self._schemas.items():
+            _metadata = SchemaMetadata(name=name, icon=schema.__config__.icon)
             model_metadata.append(_metadata)
         metadata = Metadata(
-            title=self.title, models=model_metadata, total=len(model_metadata)
+            title=self.title, schemas=model_metadata, total=len(model_metadata)
         )
         return metadata.dict()
 
-    def get_model_key(self, name: str) -> str:
-        model = self._model.get(name)
-        if not model:
+    def get_schema_key(self, name: str) -> str:
+        schema = self._schemas.get(name)
+        if not schema:
             return f"{self.key_prefix}:{name}"
 
-        model_key_prefix = model.__config__.key_prefix
+        model_key_prefix = schema.__config__.key_prefix
         return (
             model_key_prefix
             and f"{self.key_prefix}:{model_key_prefix}:{name}"
             or f"{self.key_prefix}:{name}"
         )
 
-    def get_model_data(self, name: str) -> dict | None:
-        model = self._model.get(name)
-        if not model:
+    def get_schema_data(self, name: str) -> dict | None:
+        schema = self._schemas.get(name)
+        if not schema:
             return None
-        key_prefix = self.get_model_key(name)
+        key_prefix = self.get_schema_key(name)
         data = self.database.get(key_prefix)
         if not data:
             return None
         return json.loads(data)
 
     def save_model_data(self, name: str, value: dict) -> bool:
-        model = self._model.get(name)
-        if not model:
+        schema = self._schemas.get(name)
+        if not schema:
             return False
-        key_prefix = self.get_model_key(name)
+        key_prefix = self.get_schema_key(name)
         data = json.dumps(value)
         return bool(self.database.set(key_prefix, data))
 
@@ -94,29 +96,29 @@ class BaseConger:
         return jsonify(error=str(e)), 400
 
 
-class Conger(BaseConger):
+class Admin(BaseAdmin):
     """
     from flask import Flask
-    from congers import Conger, BaseModel
-    from pydantic import BaseModel
+    from schema_admin import Admin, BaseSchema
+    from pydantic import BaseSchema
 
     app = Flask(__name__)
-    congers = Conger(app)
+    schema_admin = Admin(app)
 
-    class User(BaseModel):
+    class Schema(BaseSchema):
         name: str
         desc: str = "this is description"
         age: int
 
-    congers.add_model(User)
+    schema_admin.add_schema(User)
     """
 
     def __init__(
         self,
         app: Flask,
         database,
-        title: str = "Conger",
-        url_prefix: str = "/congers",
+        title: str = "Admin",
+        url_prefix: str = "/admin",
         theme: str = "default",
     ) -> None:
         self.url_prefix = url_prefix
@@ -139,16 +141,16 @@ class Conger(BaseConger):
 
     def _register_api_router(self):
         self.api.add_url_rule("/", view_func=self.api_index, methods=["GET"])
-        self.api.add_url_rule("/models", view_func=self.get_models, methods=["GET"])
+        self.api.add_url_rule("/schemas", view_func=self.get_schemas, methods=["GET"])
         self.api.add_url_rule(
-            "/models/<name>", view_func=self.get_model, methods=["GET"]
+            "/schemas/<name>", view_func=self.get_schema, methods=["GET"]
         )
         self.api.add_url_rule(
-            "/models/<name>/data", view_func=self.post_model_data, methods=["POST"]
+            "/schemas/<name>/data", view_func=self.post_schema_data, methods=["POST"]
         )
 
     def index(self, path=""):
-        manifest_file = load_package_files("congers/static/manifest.json")
+        manifest_file = load_package_files("schema_admin/static/manifest.json")
         with open(manifest_file, "r") as f:
             manifest = f.read()
 
@@ -162,21 +164,20 @@ class Conger(BaseConger):
     def api_index(self):
         return self.metadata()
 
-    def get_models(self):
-        model_list = [{name: model.schema()} for name, model in self._model.items()]
-        return {"models": model_list, "total": len(self._model)}
+    def get_schemas(self):
+        model_list = [{name: schema.schema()} for name, schema in self._schemas.items()]
+        return {"models": model_list, "total": len(self._schemas)}
 
-    def get_model(self, name: str) -> dict:
-        model = self._model.get(name)
-        schema = model and model.schema() or {}
-        model_data = self.get_model_data(name)
-        print(Model(schema=schema, data=model_data or {}).dict(by_alias=True))
-        return Model(schema=schema, data=model_data or {}).dict(by_alias=True)
+    def get_schema(self, name: str) -> dict:
+        schema = self._schemas.get(name)
+        schema = schema and schema.schema() or {}
+        model_data = self.get_schema_data(name)
+        return Schema(struct=schema, data=model_data or {}).dict(by_alias=True)
 
-    def post_model_data(self, name: str) -> dict:
-        model = self._model.get(name)
-        if not model:
-            abort(404, "Model data not found")
+    def post_schema_data(self, name: str) -> dict:
+        schema = self._schemas.get(name)
+        if not schema:
+            abort(404, "Schema data not found")
 
         data = request.get_json()
         saved = self.save_model_data(name, data)
