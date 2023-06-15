@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from enum import Enum
 
@@ -9,7 +11,12 @@ app = Flask(__name__)
 
 db = pickledb.load("./db.json", True)
 
-schema_admin = Admin(app, database=db)
+schema_admin = Admin(
+    app,
+    database=db,
+    title="My Admin",
+    description="THis is my schema admin",
+)
 
 
 class FruitEnum(str, Enum):
@@ -18,6 +25,9 @@ class FruitEnum(str, Enum):
 
 
 class User(BaseSchema):
+    """
+    This is user schema description
+    """
     name: str
     desc: str = "this is description"
     age: int = Field(..., gt=18, lt=100)

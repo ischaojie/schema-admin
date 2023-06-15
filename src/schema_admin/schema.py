@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class Schema(BaseModel):
@@ -15,6 +15,5 @@ class SchemaMetadata(BaseModel):
 
 class Metadata(BaseModel):
     title: str = "Admin"
-    icon: str = ""
     total: int
     schemas: list[SchemaMetadata] = []

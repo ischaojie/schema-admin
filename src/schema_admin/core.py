@@ -15,6 +15,7 @@ from flask_cors import CORS
 
 from schema_admin.database import Database
 from schema_admin.schema import Metadata, Schema, SchemaMetadata
+from schema_admin.utils import normaliza_schema_name
 
 
 def load_package_files(path: str):
@@ -25,10 +26,17 @@ def load_package_files(path: str):
 
 
 class BaseAdmin:
-    def __init__(self, app: Flask, database: Database, title: str = "Admin") -> None:
+    def __init__(
+        self,
+        app: Flask,
+        database: Database,
+        title: str = "Admin",
+        description: str | None = None,
+    ) -> None:
         self.app = app
         self.database = database
         self.title = title
+        self.description = description
         self.key_prefix = "schemas"
 
         self.admin = Blueprint(
@@ -42,7 +50,6 @@ class BaseAdmin:
 
     def add_schema(self, schema: type[BaseSchema]) -> None:
         name = schema.__config__.title if schema.__config__.title else schema.__name__
-        name = name.lower()
         self._schemas[name] = schema
 
     def metadata(self):
@@ -51,21 +58,26 @@ class BaseAdmin:
             _metadata = SchemaMetadata(name=name, icon=schema.__config__.icon)
             model_metadata.append(_metadata)
         metadata = Metadata(
-            title=self.title, schemas=model_metadata, total=len(model_metadata)
+            title=self.title,
+            total=len(model_metadata),
+            schemas=model_metadata,
         )
         return metadata.dict()
 
     def get_schema_key(self, name: str) -> str:
+        """
+        key pattern will be: `key_prefix:key_name`
+        """
         schema = self._schemas.get(name)
         if not schema:
             return f"{self.key_prefix}:{name}"
 
-        model_key_prefix = schema.__config__.key_prefix
-        return (
-            model_key_prefix
-            and f"{self.key_prefix}:{model_key_prefix}:{name}"
-            or f"{self.key_prefix}:{name}"
-        )
+        schema_key_name = schema.__config__.key_name
+        if schema_key_name:
+            return f"{self.key_prefix}:{schema_key_name}"
+
+        schema_name = normaliza_schema_name(schema.__name__)
+        return f"{self.key_prefix}:{schema_name}"
 
     def get_schema_data(self, name: str) -> dict | None:
         schema = self._schemas.get(name)
@@ -117,14 +129,20 @@ class Admin(BaseAdmin):
         self,
         app: Flask,
         database,
-        title: str = "Admin",
         url_prefix: str = "/admin",
         theme: str = "default",
+        title: str = "Admin",
+        description: str | None = None,
     ) -> None:
         self.url_prefix = url_prefix
         self.theme = theme
 
-        super().__init__(app, database=database, title=title)
+        super().__init__(
+            app,
+            database=database,
+            title=title,
+            description=description,
+        )
 
         self.enable_cors()
         self._register_router()
@@ -157,6 +175,7 @@ class Admin(BaseAdmin):
         manifest = json.loads(manifest)
         context = {
             "title": self.title,
+            "description": self.description,
             "manifest": manifest,
         }
         return render_template("index.html", **context)
