@@ -46,16 +46,20 @@ class BaseAdmin:
             template_folder=load_package_files("schema_admin/templates"),
         )
         self.api = Blueprint("api", __name__)
-        self._schemas: dict[str, type[BaseSchema]] = {}
+        self._schemas: dict[str, tuple[str, type[BaseSchema]]] = {}
 
     def add_schema(self, schema: type[BaseSchema]) -> None:
         name = schema.__config__.title if schema.__config__.title else schema.__name__
-        self._schemas[name] = schema
+        ident = name.lower()
+        self._schemas[ident] = (name, schema)
 
     def metadata(self):
         model_metadata = []
-        for name, schema in self._schemas.items():
-            _metadata = SchemaMetadata(name=name, icon=schema.__config__.icon)
+        for ident, schema in self._schemas.items():
+            name, _schema = schema
+            _metadata = SchemaMetadata(
+                name=name, id=ident, icon=_schema.__config__.icon
+            )
             model_metadata.append(_metadata)
         metadata = Metadata(
             title=self.title,
@@ -68,7 +72,7 @@ class BaseAdmin:
         """
         key pattern will be: `key_prefix:key_name`
         """
-        schema = self._schemas.get(name)
+        schema = self._get_schema(name)
         if not schema:
             return f"{self.key_prefix}:{name}"
 
@@ -79,8 +83,12 @@ class BaseAdmin:
         schema_name = normaliza_schema_name(schema.__name__)
         return f"{self.key_prefix}:{schema_name}"
 
+    def _get_schema(self, name: str) -> type[BaseSchema] | None:
+        _, schema = self._schemas.get(name, (None, None))
+        return schema
+
     def get_schema_data(self, name: str) -> dict | None:
-        schema = self._schemas.get(name)
+        schema = self._get_schema(name)
         if not schema:
             return None
         key_prefix = self.get_schema_key(name)
@@ -90,7 +98,7 @@ class BaseAdmin:
         return json.loads(data)
 
     def save_model_data(self, name: str, value: dict) -> bool:
-        schema = self._schemas.get(name)
+        schema = self._get_schema(name)
         if not schema:
             return False
         key_prefix = self.get_schema_key(name)
@@ -188,13 +196,17 @@ class Admin(BaseAdmin):
         return {"models": model_list, "total": len(self._schemas)}
 
     def get_schema(self, name: str) -> dict:
-        schema = self._schemas.get(name)
-        schema = schema and schema.schema() or {}
+        schema_cls = self._get_schema(name)
+        if not schema_cls:
+            return {}
+        struct = schema_cls.schema()
+        ui = schema_cls.ui_schema()
         model_data = self.get_schema_data(name)
-        return Schema(struct=schema, data=model_data or {}).dict(by_alias=True)
+        schema = Schema(struct=struct, ui=ui, data=model_data or {})
+        return schema.dict(by_alias=True)
 
     def post_schema_data(self, name: str) -> dict:
-        schema = self._schemas.get(name)
+        schema = self._get_schema(name)
         if not schema:
             abort(404, "Schema data not found")
 

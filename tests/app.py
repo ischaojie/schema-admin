@@ -18,6 +18,7 @@ class Book(BaseSchema):
     author: str
     press: str
     price: float = Field(..., gt=0)
+    saleout: bool = Field(default=False, widget='radio')
 
 
 class BookCustom(Book):

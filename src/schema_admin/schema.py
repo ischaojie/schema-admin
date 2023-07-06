@@ -4,12 +4,17 @@ from pydantic import BaseModel
 
 
 class Schema(BaseModel):
+    # The struct of this schema
     struct: dict
+    # Options for UI
+    ui: dict
+    # THe form data
     data: dict
 
 
 class SchemaMetadata(BaseModel):
     name: str | None = None
+    id: str | None = None
     icon: str | None = None
 
 

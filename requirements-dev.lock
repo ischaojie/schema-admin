@@ -20,6 +20,7 @@ pickledb==0.9.2
 pluggy==1.0.0
 pydantic==1.10.9
 pytest==7.3.2
+ruff==0.0.277
 six==1.16.0
 typing-extensions==4.6.3
 werkzeug==2.3.6

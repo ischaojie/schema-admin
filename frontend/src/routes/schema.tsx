@@ -7,9 +7,9 @@ import { getSchema, saveSchemaData } from "../services/schemas";
 import { Snackbar, Alert } from "@mui/material";
 
 export async function loader({ params }) {
-  const schemaName = params.schemaId;
-  const schema = await getSchema(schemaName);
-  return { schemaName, schema };
+  const schemaId = params.schemaId;
+  const schema = await getSchema(schemaId);
+  return { schemaId, schema };
 }
 
 export default function Schema(props) {
@@ -35,6 +35,7 @@ export default function Schema(props) {
     <div>
       <SchemaForm
         schema={schema.struct}
+        uiSchema={schema.ui}
         formData={schemaData}
         validator={validator}
         onSubmit={Submit}

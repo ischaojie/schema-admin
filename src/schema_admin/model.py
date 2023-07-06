@@ -1,6 +1,6 @@
 from __future__ import annotations
-
-from pydantic import BaseConfig, BaseModel, Field  # noqa
+from typing import Any
+from pydantic import BaseConfig, BaseModel  # noqa
 
 
 class SchemaConfig(BaseConfig):
@@ -15,4 +15,20 @@ class SchemaConfig(BaseConfig):
 
 
 class BaseSchema(BaseModel):
-    Config = SchemaConfig
+    @classmethod
+    def ui_schema(cls):
+        schema = {}
+        for name, field in cls.__fields__.items():
+            widget = field.field_info.extra.get("widget")
+            if not widget:
+                continue
+            schema[name] = {
+                "ui:widget": widget,
+            }
+        return schema
+
+    class Config(SchemaConfig):
+        @staticmethod
+        def schema_extra(schema: dict[str, Any], model: type["BaseSchema"]) -> None:
+            for prop in schema.get("properties", {}).values():
+                prop.pop("widget", None)

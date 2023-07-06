@@ -109,8 +109,8 @@ export default function Root() {
                 <>
                   {metadata.schemas.map((schema, index) => (
                     <Link
-                      to={`schemas/${schema.name}`}
-                      key={schema.name}
+                      to={`schemas/${schema.id}`}
+                      key={schema.id}
                       className="no-underline text-black"
                     >
                       <ListItemButton
