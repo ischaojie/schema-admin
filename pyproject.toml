@@ -21,12 +21,16 @@ dev-dependencies = [
     "pickledb~=0.9.2",
     "pytest~=7.3.1",
     "ruff>=0.0.277",
+    "mkdocs>=1.4.3",
+    "mkdocs-material>=9.1.18",
 ]
 
 [tool.rye.scripts]
 test = "pytest tests -s"
 format = "ruff check --fix src/schema_admin tests"
 lint = "ruff check src/schema_admin tests"
+mkdocs-build = "mkdocs build"
+mkdocs-serve = "mkdocs serve"
 
 [tool.hatch.metadata]
 allow-direct-references = true
