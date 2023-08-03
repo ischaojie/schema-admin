@@ -30,6 +30,8 @@ class User(BaseSchema):
 
 And wow:
 
+> There have a [demo](https://schema-admin-demo.chaojie.fun/admin) site, you can find code in [here](/example/).
+
 ![demo](assets/admin.png)
 
 
