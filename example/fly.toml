@@ -23,3 +23,5 @@ processes = []
     type = "requests"
     soft_limit = 200
     hard_limit = 250
+  [http_service.http_options.response.headers]
+    Content-Security-Policy = 'upgrade-insecure-requests'
