@@ -154,6 +154,7 @@ class Admin(BaseAdmin):
 
         self.enable_cors()
         self._register_router()
+        self.register_error()
 
     def enable_cors(self):
         CORS(self.app)

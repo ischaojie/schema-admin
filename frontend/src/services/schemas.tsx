@@ -18,13 +18,7 @@ export async function getMetadata() {
 
 export async function saveSchemaData(name: string, data: any) {
   return await axios
-    .post(`/admin/api/schemas/${name}/data`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
+    .post(`/admin/api/schemas/${name}/data`, data)
     .then((rsp) => rsp.data)
     .catch((err) => console.error(err));
 }
