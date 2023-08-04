@@ -13,7 +13,7 @@ export async function loader({ params }) {
 }
 
 export default function Schema(props) {
-  const { SchemaName, schema } = useLoaderData();
+  const { schemaId, schema } = useLoaderData();
   const [open, SetOpen] = useState(false);
   const [schemaData, setSchemaData] = useState({});
 
@@ -22,7 +22,7 @@ export default function Schema(props) {
   }, [schema.data]);
 
   const Submit = (e) => {
-    saveSchemaData(SchemaName, e.formData);
+    saveSchemaData(schemaId, e.formData);
     SetOpen(true);
     setSchemaData(e.formData);
   };
